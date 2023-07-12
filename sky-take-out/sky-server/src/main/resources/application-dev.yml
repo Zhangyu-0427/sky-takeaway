@@ -8,6 +8,6 @@ sky:
     password: zhangyu
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tLrn4vyhwC47w27UseE
-    access-key-secret: TwTbnlqeml1HQq9WKCZVYLg6Vef6bH
+    access-key-id: LTAI5tJDoyGQEz2xrJ7sQg43
+    access-key-secret: fcPGA6OT4PQHgXxxP6PuKEarV3DjU6
     bucket-name: sky-takeaway-zy
