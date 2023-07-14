@@ -105,7 +105,6 @@ public class DishServiceImpl implements DishService {
         }
     }
 
-
     /**
      * 根据id查询菜品和口味
      *
@@ -150,7 +149,6 @@ public class DishServiceImpl implements DishService {
         }
     }
 
-
     /**
      * 菜品起售或停售
      *
@@ -171,8 +169,8 @@ public class DishServiceImpl implements DishService {
             dishIds.add(id);
 
             List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishId(dishIds);
-            if(setmealIds != null && setmealIds.size() > 0) {
-                for(Long setmealId : setmealIds) {
+            if (setmealIds != null && setmealIds.size() > 0) {
+                for (Long setmealId : setmealIds) {
                     Setmeal setmeal = Setmeal.builder()
                             .id(setmealId)
                             .status(StatusConstant.DISABLE)
@@ -181,6 +179,22 @@ public class DishServiceImpl implements DishService {
                 }
             }
         }
+    }
+
+    /**
+     * 根据分类id或者菜品名称查询菜品
+     *
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> listByCategoryIdOrDishName(Long categoryId, String dishName) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .name(dishName)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.getByCategoryIdOrDishName(dish);
     }
 
 }
