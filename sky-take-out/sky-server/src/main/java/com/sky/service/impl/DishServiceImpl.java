@@ -13,6 +13,7 @@ import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -36,6 +37,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
@@ -175,7 +179,7 @@ public class DishServiceImpl implements DishService {
                             .id(setmealId)
                             .status(StatusConstant.DISABLE)
                             .build();
-                    setmealDishMapper.update(setmeal);
+                    setmealMapper.update(setmeal);
                 }
             }
         }

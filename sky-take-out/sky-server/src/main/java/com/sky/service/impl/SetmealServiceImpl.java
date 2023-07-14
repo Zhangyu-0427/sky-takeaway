@@ -2,12 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -74,10 +76,11 @@ public class SetmealServiceImpl implements SetmealService {
      *
      * @param ids
      */
+    @Transactional
     public void deleteBatch(List<Long> ids) {
         ids.forEach(id -> {
             Setmeal setmeal = setmealMapper.getById(id);
-            if(setmeal.getStatus() == StatusConstant.ENABLE) {
+            if (setmeal.getStatus() == StatusConstant.ENABLE) {
                 //起售中的套餐不能被删除
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
@@ -90,5 +93,46 @@ public class SetmealServiceImpl implements SetmealService {
             //删除套餐菜品关系表中的关联数据
             setmealDishMapper.deleteBySetmealId(setmealId);
         });
+    }
+
+    /**
+     * 根据id查询套餐和关联的菜品数据
+     *
+     * @param id
+     * @return
+     */
+    @Transactional
+    public SetmealVO getByIdWithDish(Long id) {
+        Setmeal setmeal = setmealMapper.getById(id);
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+        setmealVO.setSetmealDishes(setmealDishes);
+        return setmealVO;
+    }
+
+    /**
+     * 修改套餐
+     *
+     * @param setmealDTO
+     */
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        setmealMapper.update(setmeal);
+
+        Long setmealId = setmealDTO.getId();
+
+        //删除原有关联的菜品信息
+        setmealDishMapper.deleteBySetmealId(setmealId);
+
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmealId);
+        });
+
+        setmealDishMapper.insertBatch(setmealDishes);
     }
 }
