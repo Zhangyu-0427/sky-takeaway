@@ -46,7 +46,7 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
         //2、校验令牌
         try {
             log.info("jwt校验:{}", token);
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
             BaseContext.setCurrentId(userId); //客户端每一次请求都会新开一个线程，使用ThreadLocal进行存储，来实现非典型组件间的信息传递
             log.info("当前用户id：{}", userId);
