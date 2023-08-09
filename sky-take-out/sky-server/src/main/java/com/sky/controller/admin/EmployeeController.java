@@ -151,7 +151,8 @@ public class EmployeeController {
     @ApiOperation(value = "修改员工密码")
     public Result updatePassword(@RequestBody PasswordEditDTO passwordEditDTO) {
         log.info("编辑员工密码：{}", passwordEditDTO);
-        return employeeService.updatePassword(passwordEditDTO);
+        employeeService.updatePassword(passwordEditDTO);
+        return Result.success();
     }
 
 }

@@ -56,5 +56,5 @@ public interface EmployeeService {
      */
     void update(EmployeeDTO employeeDTO);
 
-    Result updatePassword(PasswordEditDTO passwordEditDTO);
+    void updatePassword(PasswordEditDTO passwordEditDTO);
 }
