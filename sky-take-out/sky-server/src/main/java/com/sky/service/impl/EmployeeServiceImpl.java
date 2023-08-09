@@ -9,12 +9,14 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
+import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import lombok.val;
 import org.springframework.beans.BeanUtils;
@@ -41,29 +43,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         String username = employeeLoginDTO.getUsername();
         String password = employeeLoginDTO.getPassword();
 
-        //1、根据用户名查询数据库中的数据
+        // 1、根据用户名查询数据库中的数据
         Employee employee = employeeMapper.getByUsername(username);
 
-        //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
+        // 2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
         if (employee == null) {
-            //账号不存在
+            // 账号不存在
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
-        //密码比对
-        //对前端传过来的明文密码进行md5加密处理
+        // 密码比对
+        // 对前端传过来的明文密码进行md5加密处理
         password = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
-            //密码错误
+            // 密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
         if (employee.getStatus() == StatusConstant.DISABLE) {
-            //账号被锁定
+            // 账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
 
-        //3、返回实体对象
+        // 3、返回实体对象
         return employee;
     }
 
@@ -75,13 +77,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
 
-        //对象属性拷贝
+        // 对象属性拷贝
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        //设置账号的状态
+        // 设置账号的状态
         employee.setStatus(StatusConstant.ENABLE);
 
-        //设置账号默认密码
+        // 设置账号默认密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 
         employeeMapper.insert(employee);
@@ -94,7 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return
      */
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        //开始分页查询
+        // 开始分页查询
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
@@ -113,7 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
-        Employee employee = Employee.builder() //由Lombok插件中的@Builder所支持
+        Employee employee = Employee.builder() // 由Lombok插件中的@Builder所支持
                 .status(status)
                 .id(id)
                 .build();
@@ -143,6 +145,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
         employeeMapper.update(employee);
+    }
+
+    @Override
+    public Result updatePassword(PasswordEditDTO passwordEditDTO) {
+        Employee employee = employeeMapper.getById(BaseContext.getCurrentId());
+
+        if (DigestUtils.md5DigestAsHex
+                (passwordEditDTO.getOldPassword().getBytes())
+                .equals(employee.getPassword())) {
+            employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
+            employeeMapper.update(employee);
+            return Result.success();
+        }
+
+        return Result.error(MessageConstant.PASSWORD_EDIT_FAILED);
     }
 
 }
