@@ -85,6 +85,12 @@ public class OrderServiceImpl implements OrderService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(BaseContext.getCurrentId());
+        orders.setAddress(
+                addressBook.getProvinceName() +
+                addressBook.getCityName() +
+                addressBook.getDistrictName() + "," +
+                addressBook.getDetail()
+        );
 
         orderMapper.insert(orders);
 
