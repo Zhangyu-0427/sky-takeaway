@@ -419,6 +419,7 @@ public class OrderServiceImpl implements OrderService {
         Orders orders = new Orders();
         orders.setId(ordersDB.getId());
         orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason(ordersRejectionDTO.getRejectionReason()); // 拒接相当于取消了
         orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
         orders.setCancelTime(LocalDateTime.now());
 
