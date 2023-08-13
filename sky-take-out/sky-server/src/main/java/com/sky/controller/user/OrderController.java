@@ -49,9 +49,10 @@ public class OrderController {
 
     /**
      * 历史订单查询
+     *
      * @param page
      * @param pageSize
-     * @param status 订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+     * @param status   订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
      * @return
      */
     @GetMapping("/historyOrders")
@@ -96,6 +97,19 @@ public class OrderController {
     @ApiOperation("再来一单")
     public Result repetition(@PathVariable Long id) {
         orderService.repetition(id);
+        return Result.success();
+    }
+
+    /**
+     * 客户催单
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("客户催单")
+    public Result reminder(@PathVariable("id") Long id) {
+        orderService.reminder(id);
         return Result.success();
     }
 
