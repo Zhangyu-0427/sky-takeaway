@@ -14,6 +14,7 @@ import com.sky.vo.SetmealOverViewVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     /**
      * 根据时间段统计营业数据
+     *
      * @param begin
      * @param end
      * @return
@@ -48,31 +50,33 @@ public class WorkspaceServiceImpl implements WorkspaceService {
          */
 
         Map map = new HashMap();
-        map.put("begin",begin);
-        map.put("end",end);
+        map.put("begin", begin);
+        map.put("end", end);
 
-        //查询总订单数
+        // 查询总订单数
         Integer totalOrderCount = orderMapper.countByMap(map);
 
         map.put("status", Orders.COMPLETED);
-        //营业额
+        // 营业额
         Double turnover = orderMapper.sumByMap(map);
-        turnover = turnover == null? 0.0 : turnover;
+        turnover = turnover == null ? 0.0 : turnover;
 
-        //有效订单数
+        // 有效订单数
         Integer validOrderCount = orderMapper.countByMap(map);
 
         Double unitPrice = 0.0;
 
         Double orderCompletionRate = 0.0;
-        if(totalOrderCount != 0 && validOrderCount != 0){
-            //订单完成率
+        if (totalOrderCount != 0 && validOrderCount != 0) {
+            // 订单完成率
             orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
-            //平均客单价
+            // 平均客单价
             unitPrice = turnover / validOrderCount;
         }
 
-        //新增用户数
+        unitPrice = Double.valueOf(String.format("%.2f", unitPrice));
+
+        // 新增用户数
         Integer newUsers = userMapper.countByMap(map);
 
         return BusinessDataVO.builder()
@@ -95,22 +99,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         map.put("begin", LocalDateTime.now().with(LocalTime.MIN));
         map.put("status", Orders.TO_BE_CONFIRMED);
 
-        //待接单
+        // 待接单
         Integer waitingOrders = orderMapper.countByMap(map);
 
-        //待派送
+        // 待派送
         map.put("status", Orders.CONFIRMED);
         Integer deliveredOrders = orderMapper.countByMap(map);
 
-        //已完成
+        // 已完成
         map.put("status", Orders.COMPLETED);
         Integer completedOrders = orderMapper.countByMap(map);
 
-        //已取消
+        // 已取消
         map.put("status", Orders.CANCELLED);
         Integer cancelledOrders = orderMapper.countByMap(map);
 
-        //全部订单
+        // 全部订单
         map.put("status", null);
         Integer allOrders = orderMapper.countByMap(map);
 
