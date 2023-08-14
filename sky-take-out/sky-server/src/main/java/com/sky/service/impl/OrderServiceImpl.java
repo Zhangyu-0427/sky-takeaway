@@ -510,6 +510,10 @@ public class OrderServiceImpl implements OrderService {
         // 根据id查询订单
         Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
 
+        if(ordersDB.getStatus() >= Orders.COMPLETED) {
+            throw new OrderBusinessException("亲，已完成的订单暂不支持取消哦");
+        }
+
         // 支付状态
         Integer payStatus = ordersDB.getPayStatus();
         if (payStatus == 1) {
